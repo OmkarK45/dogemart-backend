@@ -5,10 +5,21 @@ import { PrismaSessionStore } from '@quixo3/prisma-session-store'
 
 import { prisma } from './config/db'
 import { corsOptions } from './config/cors'
+import { User } from '@prisma/client'
+
+import { router as AuthRouter } from './controllers/AuthControler'
 
 const app = express()
 const port = process.env.PORT || 5000
 
+declare module 'express-session' {
+	interface SessionData {
+		user?: Omit<User, 'hashedPassword'>
+		cookie: Cookie
+	}
+}
+
+app.use('/auth', AuthRouter)
 app.use(cors(corsOptions))
 app.use(express.json())
 app.use(express.raw({ type: 'application/vnd.custom-type' }))
@@ -17,7 +28,7 @@ app.use(express.text({ type: 'text/html' }))
 app.use(
 	session({
 		name: 'dogemart.cookie.v2',
-		secret: process.env.SESSION_SECRET!,
+		secret: 'MySessionSecret',
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000, //ms
 			dbRecordIdIsSessionId: true,

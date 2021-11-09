@@ -15,6 +15,16 @@ model Session {
   sid       String   @unique
   data      String
   expiresAt DateTime
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model User {
+  id             String    @id @default(uuid())
+  name           String
+  email          String    @unique
+  hashedPassword String
+  sessions       Session[]
 }
 
 model Todo {
