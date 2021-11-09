@@ -10,6 +10,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+}
+
 model Todo {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
