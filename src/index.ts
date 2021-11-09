@@ -19,16 +19,17 @@ declare module 'express-session' {
 	}
 }
 
-app.use('/auth', AuthRouter)
-app.use(cors(corsOptions))
 app.use(express.json())
-app.use(express.raw({ type: 'application/vnd.custom-type' }))
 app.use(express.text({ type: 'text/html' }))
+app.use(express.raw({ type: 'application/vnd.custom-type' }))
 
 app.use(
 	session({
 		name: 'dogemart.cookie.v2',
 		secret: 'MySessionSecret',
+		cookie: {
+			secure: false,
+		},
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000, //ms
 			dbRecordIdIsSessionId: true,
@@ -38,6 +39,8 @@ app.use(
 		saveUninitialized: false,
 	})
 )
+app.use('/auth', AuthRouter)
+app.use(cors(corsOptions))
 
 app.get('/', async (req, res) => {
 	res.send('API HEALTHY')
