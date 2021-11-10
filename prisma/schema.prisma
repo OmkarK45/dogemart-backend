@@ -10,6 +10,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator docs {
+  provider = "node node_modules/prisma-docs-generator"
+}
+
 model User {
   id             String    @id @default(uuid())
   name           String
@@ -47,13 +51,13 @@ model CartProduct {
   cartId String
   cart   Cart   @relation(fields: [cartId], references: [id])
 
-  productId String
+  productId String  @unique
   product   Product @relation(fields: [productId], references: [id])
 }
 
 model Category {
   id       String    @id @default(uuid())
-  name     String    @db.VarChar(255)
+  name     String    @unique
   products Product[]
 }
 
@@ -65,7 +69,7 @@ model Product {
   categoryId   String
   category     Category      @relation(fields: [categoryId], references: [id])
   cartProducts CartProduct[]
-  image        String?
+  images       String[]
   inStock      Boolean       @default(true)
   stocks       Int
 }
