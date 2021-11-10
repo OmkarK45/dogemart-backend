@@ -43,6 +43,7 @@ router.post('/login', async (req, res: CustomResponse) => {
 			id: user.id,
 			email: user.email,
 			name: user.name,
+			role: user.role,
 		}
 
 		req.session.user = userInfo
@@ -91,10 +92,22 @@ router.post('/signup', async (req, res: CustomResponse) => {
 				hashedPassword: await hashPassword(password),
 			},
 		})
+
+		const userCart = await prisma.cart.create({
+			data: {
+				user: {
+					connect: {
+						email: savedUser.email,
+					},
+				},
+			},
+		})
+
 		const userInfo = {
 			id: savedUser.id,
 			name: savedUser.name,
 			email: savedUser.email,
+			role: savedUser.role,
 		}
 
 		req.session.user = userInfo
@@ -118,4 +131,4 @@ router.post('/signup', async (req, res: CustomResponse) => {
 	}
 })
 
-export { router }
+export { router as AuthController }

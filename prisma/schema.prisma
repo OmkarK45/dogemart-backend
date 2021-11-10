@@ -10,6 +10,18 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id             String    @id @default(uuid())
+  name           String
+  email          String    @unique
+  hashedPassword String
+  sessions       Session[]
+  role           RoleType  @default(USER)
+  // a user may not have a cart
+  //  we will create a cart table connecting the record
+  cart           Cart?
+}
+
 model Session {
   id        String   @id
   sid       String   @unique
@@ -19,17 +31,46 @@ model Session {
   userId    String?
 }
 
-model User {
-  id             String    @id @default(uuid())
-  name           String
-  email          String    @unique
-  hashedPassword String
-  sessions       Session[]
+model Cart {
+  id           String        @id @default(uuid())
+  // Products in the cart
+  cartProducts CartProduct[]
+  //  owner of the cart
+  userId       String        @unique
+  user         User          @relation(fields: [userId], references: [id])
 }
 
-model Todo {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  text      String
-  completed Boolean
+model CartProduct {
+  id       String @id @default(uuid())
+  quantity Int
+
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @db.VarChar(255)
+  products Product[]
+}
+
+model Product {
+  id           String        @id @default(uuid())
+  name         String        @db.VarChar(255)
+  description  String
+  price        Float
+  categoryId   String
+  category     Category      @relation(fields: [categoryId], references: [id])
+  cartProducts CartProduct[]
+  image        String?
+  inStock      Boolean       @default(true)
+  stocks       Int
+}
+
+enum RoleType {
+  ADMIN
+  USER
 }

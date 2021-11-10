@@ -13,5 +13,8 @@ export const requireAuth: RequestHandler = async (
 			error_code: 'ERROR_UNAUTHORIZED',
 		})
 	}
+
+	req.user = user
+
 	next()
 }

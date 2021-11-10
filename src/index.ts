@@ -7,7 +7,8 @@ import { prisma } from './config/db'
 import { corsOptions } from './config/cors'
 import { User } from '@prisma/client'
 
-import { router as AuthRouter } from './controllers/AuthControler'
+import { AuthController } from './controllers/AuthController'
+import { ProductController } from './controllers/ProductController'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -39,7 +40,8 @@ app.use(
 		saveUninitialized: false,
 	})
 )
-app.use('/auth', AuthRouter)
+app.use('/auth', AuthController)
+app.use('/products', ProductController)
 app.use(cors(corsOptions))
 
 app.get('/', async (req, res) => {

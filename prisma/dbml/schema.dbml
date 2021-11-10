@@ -1,0 +1,78 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Session {
+  id String [pk]
+  sid String [unique, not null]
+  data String [not null]
+  expiresAt DateTime [not null]
+  User User
+  userId String
+}
+
+Table Cart {
+  id String [pk]
+  userId String [unique, not null]
+  cartProducts CartProduct [not null]
+  type CartType [not null, default: 'CART']
+  User User [not null]
+}
+
+Table CartProduct {
+  id String [pk]
+  cartId String [not null]
+  productId String [not null]
+  quantity Int [not null]
+  cart Cart [not null]
+  product Product [not null]
+}
+
+Table Category {
+  id String [pk]
+  name String [unique, not null]
+  products Product [not null]
+}
+
+Table Product {
+  id String [pk]
+  name String [not null]
+  description String [not null]
+  price Float [not null]
+  categoryId String [not null]
+  category Category [not null]
+  cartProducts CartProduct [not null]
+  image String
+  inStock Boolean [not null, default: true]
+  stocks Int [not null]
+}
+
+Table User {
+  id String [pk]
+  name String [not null]
+  email String [unique, not null]
+  hashedPassword String [not null]
+  sessions Session [not null]
+  role RoleType [not null, default: 'USER']
+  cart Cart
+}
+
+Enum CartType {
+  CART
+  WISHLIST
+}
+
+Enum RoleType {
+  ADMIN
+  USER
+}
+
+Ref: Session.userId > User.id
+
+Ref: Cart.userId - User.id
+
+Ref: CartProduct.cartId > Cart.id
+
+Ref: CartProduct.productId > Product.id
+
+Ref: Product.categoryId > Category.id
