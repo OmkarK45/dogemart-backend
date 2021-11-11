@@ -60,6 +60,7 @@ Table Product {
   images String [not null]
   price Float [not null]
   discount Int [not null, default: 0]
+  slug String
   wishlist Wishlist [not null]
   cart Cart [not null]
   comments Comment [not null]

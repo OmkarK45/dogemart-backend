@@ -11,6 +11,7 @@ import {
 
 import { z } from 'zod'
 import { isAdmin } from '../utils/validateAdmin'
+import generateSlugFromName from '../utils/getSlug'
 
 const router = Router()
 
@@ -45,6 +46,7 @@ router.post(
 					images: input.images,
 					excerpt: input.description.slice(0, 100),
 					brand: input.brand,
+					slug: generateSlugFromName(input.title, 'product', true),
 					user: {
 						connect: {
 							id: user?.id,
@@ -81,6 +83,7 @@ const EditProductBody = z.object({
 	price: z.number().optional(),
 	stock: z.number().optional(),
 	images: z.array(z.string()).optional(),
+	brand: z.string().optional(),
 })
 
 router.post(
@@ -103,6 +106,7 @@ router.post(
 					stock: input.stock,
 					images: input.images,
 					price: input.price,
+					brand: input.brand,
 				},
 			})
 			if (!updatedProduct) {
@@ -159,9 +163,60 @@ router.post(
 			if (user.role !== 'ADMIN')
 				throw new Error('You are not authorized to do that.')
 
-			// Delete a product
 			await prisma.product.delete({
 				where: { id },
+			})
+
+			res.json({
+				code: 'SUCCESS',
+				success: true,
+				data: {
+					message: 'Requested Product has been deleted',
+				},
+			})
+		} catch (e: any) {
+			console.log(
+				`[Error] : File - Product Controller, Function : /add [post]`,
+				e.message
+			)
+			return res.status(500).json({
+				code: 'INTERNAL_ERROR',
+				success: false,
+				data: e.message,
+			})
+		}
+	}
+)
+
+// Category creation
+const CreateCategoryInput = z.object({
+	category_name: z.string(),
+})
+
+router.post(
+	'/category/create',
+	requireAuth,
+	validateRequestBody(CreateCategoryInput),
+	async (req: ExpressRequest, res: CustomResponse) => {
+		const input = req.body
+		const user = req.user
+
+		try {
+			if (user?.role === 'USER')
+				throw new Error('Your role is not sufficient to do that.')
+
+			const newCategory = await prisma.category.create({
+				data: {
+					category_name: input.category_name,
+				},
+			})
+
+			res.json({
+				code: 'SUCCESS',
+				success: true,
+				data: {
+					category: newCategory,
+				},
 			})
 		} catch (e: any) {
 			console.log(
