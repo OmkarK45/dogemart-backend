@@ -20,6 +20,7 @@ const ProductAddInput = z.object({
 	price: z.number(),
 	stock: z.number(),
 	images: z.array(z.string()),
+	brand: z.string().optional(),
 })
 type ProductAddInputType = z.infer<typeof ProductAddInput>
 
@@ -43,6 +44,7 @@ router.post(
 					stock: input.stock,
 					images: input.images,
 					excerpt: input.description.slice(0, 100),
+					brand: input.brand,
 					user: {
 						connect: {
 							id: user?.id,
