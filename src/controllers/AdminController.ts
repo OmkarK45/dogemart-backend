@@ -12,6 +12,7 @@ import {
 import { z } from 'zod'
 import { isAdmin } from '../utils/validateAdmin'
 import generateSlugFromName from '../utils/getSlug'
+import { HttpStatus } from '../utils/statusCodes'
 
 const router = Router()
 
@@ -68,7 +69,7 @@ router.post(
 				e.message
 			)
 			return res.status(500).json({
-				code: 'INTERNAL_ERROR',
+				code: HttpStatus.INTERNAL_SERVER_ERROR,
 				success: false,
 				data: e.message,
 			})
@@ -131,7 +132,7 @@ router.post(
 				e.message
 			)
 			return res.status(500).json({
-				code: 'INTERNAL_ERROR',
+				code: HttpStatus.INTERNAL_SERVER_ERROR,
 				success: false,
 			})
 		}
@@ -180,7 +181,7 @@ router.post(
 				e.message
 			)
 			return res.status(500).json({
-				code: 'INTERNAL_ERROR',
+				code: HttpStatus.INTERNAL_SERVER_ERROR,
 				success: false,
 				data: e.message,
 			})
@@ -224,7 +225,7 @@ router.post(
 				e.message
 			)
 			return res.status(500).json({
-				code: 'INTERNAL_ERROR',
+				code: HttpStatus.INTERNAL_SERVER_ERROR,
 				success: false,
 				data: e.message,
 			})

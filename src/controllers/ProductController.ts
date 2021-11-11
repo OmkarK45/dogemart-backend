@@ -6,6 +6,7 @@ import {
 	validateRequestParams,
 } from 'zod-express-middleware'
 import { z } from 'zod'
+import { HttpStatus } from '../utils/statusCodes'
 
 // Handler to get all products
 
@@ -46,7 +47,7 @@ router.get('/all', async (req, res: CustomResponse) => {
 		})
 	} catch (e: any) {
 		res.json({
-			code: 'INTERNAL_ERROR',
+			code: HttpStatus.INTERNAL_SERVER_ERROR,
 			success: false,
 			data: e.message,
 		})
@@ -80,7 +81,7 @@ router.get('/:id', validateRequestParams(OneProductInput), async (req, res) => {
 		})
 	} catch (e: any) {
 		res.json({
-			code: 'INTERNAL_ERROR',
+			code: HttpStatus.INTERNAL_SERVER_ERROR,
 			success: false,
 			data: e.message,
 		})
@@ -91,7 +92,7 @@ const SearchInput = z.object({
 	keyword: z.string(),
 })
 // get search result
-router.get(
+router.post(
 	'/search',
 	validateRequestBody(SearchInput),
 	async (req, res: CustomResponse) => {
@@ -102,9 +103,9 @@ router.get(
 			const products = await prisma.product.findMany({
 				where: {
 					OR: [
-						{ description: { contains: keyword.toLowerCase() } },
-						{ title: { contains: keyword.toLowerCase() } },
-						{ excerpt: { contains: keyword.toLowerCase() } },
+						{ description: { contains: keyword, mode: 'insensitive' } },
+						{ title: { contains: keyword, mode: 'insensitive' } },
+						{ excerpt: { contains: keyword, mode: 'insensitive' } },
 					],
 				},
 				include: {
@@ -123,7 +124,7 @@ router.get(
 			})
 		} catch (e: any) {
 			res.json({
-				code: 'INTERNAL_ERROR',
+				code: HttpStatus.INTERNAL_SERVER_ERROR,
 				success: false,
 				data: e.message,
 			})
@@ -157,7 +158,7 @@ router.get('/all/category', async (req, res: CustomResponse) => {
 		})
 	} catch (e: any) {
 		res.json({
-			code: 'INTERNAL_ERROR',
+			code: HttpStatus.INTERNAL_SERVER_ERROR,
 			success: false,
 			data: e.message,
 		})

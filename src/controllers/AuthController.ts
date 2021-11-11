@@ -4,6 +4,7 @@ import { prisma } from '../config/db'
 import { CustomResponse, ExpressRequest } from '../config/express'
 import { requireAuth } from '../middlewares/AuthMiddleware'
 import { hashPassword, verifyPassword } from '../utils/password'
+import { HttpStatus } from '../utils/statusCodes'
 
 const router = Router()
 
@@ -66,7 +67,7 @@ router.post('/login', async (req, res: CustomResponse) => {
 		)
 		res.json({
 			success: false,
-			code: 'INTERNAL_ERROR',
+			code: HttpStatus.INTERNAL_SERVER_ERROR,
 		})
 	}
 })
@@ -121,7 +122,7 @@ router.post('/signup', async (req, res: CustomResponse) => {
 		)
 		res.json({
 			success: false,
-			code: 'INTERNAL_ERROR',
+			code: HttpStatus.INTERNAL_SERVER_ERROR,
 		})
 	}
 })

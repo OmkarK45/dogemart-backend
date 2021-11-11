@@ -46,9 +46,13 @@ Table Cart {
   id Int [pk, increment]
   product Product
   product_id String
-  quantity Int [not null]
+  quantity Int
   user User [not null]
   user_id String [not null]
+
+  indexes {
+    (user_id, product_id) [unique]
+  }
 }
 
 Table Product {

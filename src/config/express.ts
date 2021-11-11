@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { User } from '@prisma/client'
+import { CartStatus, HttpStatus, ProductStatus } from '../utils/statusCodes'
 
 export interface ExpressRequest extends Request {
 	user?: Omit<User, 'hashedPassword'>
@@ -15,14 +16,9 @@ interface Json {
 	success: boolean
 	data?: any
 	code:
-		| 'INTERNAL_ERROR'
-		| 'SUCCESS'
-		| 'UNAUTHORIZED'
-		| 'NOT_FOUND'
-		| 'BAD_REQUEST'
-		| 'FORBIDDEN'
-		| 'CONFLICT'
-		| 'UNPROCESSABLE_ENTITY'
+		| keyof typeof HttpStatus
+		| keyof typeof CartStatus
+		| keyof typeof ProductStatus
 }
 
 type Send<T = Response> = (body?: Json) => T

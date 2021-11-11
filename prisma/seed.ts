@@ -57,7 +57,7 @@ async function main() {
 	console.log(`---🌿 STARTED SEEDING 🌿--- `)
 	// seedUsers()
 	// seedCategories()
-	// seedProducts()
+	seedProducts()
 	console.log(`---🌿 FINISHED SEEDING 🌿--- `)
 }
 

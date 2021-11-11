@@ -62,9 +62,11 @@ model Cart {
   id         Int      @id @default(autoincrement())
   product    Product? @relation(fields: [product_id], references: [id])
   product_id String?
-  quantity   Int
+  quantity   Int?
   user       User     @relation(fields: [user_id], references: [id])
   user_id    String
+
+  @@unique([user_id, product_id])
 }
 
 model Product {
