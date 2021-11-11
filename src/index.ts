@@ -42,6 +42,7 @@ app.use(
 )
 app.use('/auth', AuthController)
 app.use('/products', AdminController)
+
 app.use(cors(corsOptions))
 
 app.get('/', async (req, res) => {

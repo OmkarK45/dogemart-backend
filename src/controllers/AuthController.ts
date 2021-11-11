@@ -1,7 +1,8 @@
 import { Router } from 'express'
 
 import { prisma } from '../config/db'
-import { CustomResponse } from '../config/express'
+import { CustomResponse, ExpressRequest } from '../config/express'
+import { requireAuth } from '../middlewares/AuthMiddleware'
 import { hashPassword, verifyPassword } from '../utils/password'
 
 const router = Router()
@@ -44,6 +45,8 @@ router.post('/login', async (req, res: CustomResponse) => {
 			email: user.email,
 			name: user.name,
 			role: user.role,
+			created_at: user.created_at,
+			update_at: user.update_at,
 		}
 
 		req.session.user = userInfo
@@ -93,21 +96,13 @@ router.post('/signup', async (req, res: CustomResponse) => {
 			},
 		})
 
-		const userCart = await prisma.cart.create({
-			data: {
-				user: {
-					connect: {
-						email: savedUser.email,
-					},
-				},
-			},
-		})
-
 		const userInfo = {
 			id: savedUser.id,
 			name: savedUser.name,
 			email: savedUser.email,
 			role: savedUser.role,
+			created_at: savedUser.created_at,
+			update_at: savedUser.update_at,
 		}
 
 		req.session.user = userInfo
@@ -130,5 +125,32 @@ router.post('/signup', async (req, res: CustomResponse) => {
 		})
 	}
 })
+
+router.get(
+	'/user-info',
+	requireAuth,
+	async (req: ExpressRequest, res: CustomResponse) => {
+		const { user } = req.session
+		const currentUser = await prisma.user.findUnique({
+			where: { email: user?.email },
+			select: {
+				cart: true,
+				email: true,
+				id: true,
+				name: true,
+				hashedPassword: false,
+				role: true,
+			},
+			rejectOnNotFound: true,
+		})
+		res.json({
+			code: 'SUCCESS',
+			success: true,
+			data: {
+				user: currentUser,
+			},
+		})
+	}
+)
 
 export { router as AuthController }

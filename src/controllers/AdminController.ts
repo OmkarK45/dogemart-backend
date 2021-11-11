@@ -15,65 +15,37 @@ import { isAdmin } from '../utils/validateAdmin'
 const router = Router()
 
 const ProductAddInput = z.object({
-	name: z.string(),
+	title: z.string(),
 	description: z.string(),
 	price: z.number(),
-	stocks: z.number(),
+	stock: z.number(),
 	images: z.array(z.string()),
-	inStock: z.boolean(),
-	category: z.object({
-		id: z.string().optional(),
-		name: z.string().optional(),
-	}),
 })
 type ProductAddInputType = z.infer<typeof ProductAddInput>
 
 router.post(
-	'/add',
+	'/create',
 	requireAuth,
 	validateRequestBody(ProductAddInput),
 	async (req: ExpressRequest, res: CustomResponse) => {
 		const input = req.body as ProductAddInputType
 		const user = req.user
 
-		if (!user) {
-			return res.json({
-				code: 'UNAUTHORIZED',
-				success: false,
-				data: {
-					message: 'You are allowed to do that.',
-				},
-			})
-		}
 		try {
-			const hasRights = await isAdmin(user?.email)
-			if (!hasRights) {
-				return res.json({
-					code: 'UNAUTHORIZED',
-					success: false,
-					data: {
-						message: 'You are allowed to do that.',
-					},
-				})
-			}
+			if (user?.role === 'USER')
+				throw new Error('Your role is not sufficient to do that.')
 
 			const newProduct = await prisma.product.create({
 				data: {
-					name: input.name,
+					title: input.title,
 					description: input.description,
 					price: input.price,
-					stocks: input.stocks,
+					stock: input.stock,
 					images: input.images,
-					category: {
-						connectOrCreate: {
-							create: {
-								name: input.category.name
-									? input.category.name
-									: 'DEFAULT_CATEGORY',
-							},
-							where: {
-								id: input.category.id,
-							},
+					excerpt: input.description.slice(0, 100),
+					user: {
+						connect: {
+							id: user?.id,
 						},
 					},
 				},
@@ -94,6 +66,7 @@ router.post(
 			return res.status(500).json({
 				code: 'INTERNAL_ERROR',
 				success: false,
+				data: e.message,
 			})
 		}
 	}
@@ -101,18 +74,11 @@ router.post(
 
 const EditProductParams = z.object({ id: z.string() })
 const EditProductBody = z.object({
-	name: z.string().optional(),
+	title: z.string().optional(),
 	description: z.string().optional(),
 	price: z.number().optional(),
-	stocks: z.number().optional(),
+	stock: z.number().optional(),
 	images: z.array(z.string()).optional(),
-	inStock: z.boolean().optional(),
-	category: z
-		.object({
-			id: z.string().optional(),
-			name: z.string().optional(),
-		})
-		.optional(),
 })
 
 router.post(
@@ -130,21 +96,11 @@ router.post(
 			const updatedProduct = await prisma.product.update({
 				where: { id: productId },
 				data: {
-					name: input.name,
+					title: input.title,
 					description: input.description,
-					inStock: input.inStock,
+					stock: input.stock,
 					images: input.images,
 					price: input.price,
-					stocks: input.stocks,
-					category: {
-						update: {
-							id: input.category?.id,
-							name: input.category?.name,
-						},
-					},
-				},
-				include: {
-					category: true,
 				},
 			})
 			if (!updatedProduct) {
@@ -198,22 +154,9 @@ router.post(
 			})
 		}
 		try {
-			const hasRights = await isAdmin(user?.email)
-			if (!hasRights) {
-				return res.json({
-					code: 'UNAUTHORIZED',
-					success: false,
-					data: {
-						message: 'You are allowed to do that.',
-					},
-				})
-			}
-			// First remove from the cart of the user
-			await prisma.cartProduct.delete({
-				where: {
-					productId: id,
-				},
-			})
+			if (user.role !== 'ADMIN')
+				throw new Error('You are not authorized to do that.')
+
 			// Delete a product
 			await prisma.product.delete({
 				where: { id },
@@ -226,6 +169,7 @@ router.post(
 			return res.status(500).json({
 				code: 'INTERNAL_ERROR',
 				success: false,
+				data: e.message,
 			})
 		}
 	}

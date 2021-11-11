@@ -14,16 +14,8 @@ generator docs {
   provider = "node node_modules/prisma-docs-generator"
 }
 
-model User {
-  id             String    @id @default(uuid())
-  name           String
-  email          String    @unique
-  hashedPassword String
-  sessions       Session[]
-  role           RoleType  @default(USER)
-  // a user may not have a cart
-  //  we will create a cart table connecting the record
-  cart           Cart?
+generator dbml {
+  provider = "prisma-dbml-generator"
 }
 
 model Session {
@@ -35,46 +27,95 @@ model Session {
   userId    String?
 }
 
-model Cart {
-  id           String        @id @default(uuid())
-  // Products in the cart
-  cartProducts CartProduct[]
-  //  owner of the cart
-  userId       String        @unique
-  user         User          @relation(fields: [userId], references: [id])
+model User {
+  id             String     @id @default(uuid())
+  name           String
+  email          String     @unique
+  hashedPassword String
+  sessions       Session[]
+  role           Role       @default(USER)
+  created_at     DateTime   @default(now())
+  update_at      DateTime   @updatedAt
+  ratings        Rating[]
+  comments       Comment[]
+  wishlists      Wishlist[]
+  products       Product[]
+  cart           Cart[]
 }
 
-model CartProduct {
-  id       String @id @default(uuid())
-  quantity Int
-
-  cartId String
-  cart   Cart   @relation(fields: [cartId], references: [id])
-
-  productId String  @unique
-  product   Product @relation(fields: [productId], references: [id])
+model Wishlist {
+  id            Int     @id @default(autoincrement())
+  product       Product @relation(fields: [product_id], references: [id])
+  product_id    String
+  wishlist_name String  @default("default")
+  user          User    @relation(fields: [user_id], references: [id])
+  user_id       String
 }
 
 model Category {
-  id       String    @id @default(uuid())
-  name     String    @unique
-  products Product[]
+  id             Int             @id @default(autoincrement())
+  category_name  String          @unique
+  category_group CategoryGroup[]
+}
+
+model Cart {
+  id         Int      @id @default(autoincrement())
+  product    Product? @relation(fields: [product_id], references: [id])
+  product_id String?
+  quantity   Int
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    String
 }
 
 model Product {
-  id           String        @id @default(uuid())
-  name         String        @db.VarChar(255)
-  description  String
-  price        Float
-  categoryId   String
-  category     Category      @relation(fields: [categoryId], references: [id])
-  cartProducts CartProduct[]
-  images       String[]
-  inStock      Boolean       @default(true)
-  stocks       Int
+  id             String          @id @default(uuid())
+  title          String
+  brand          String?         @default("GENERIC_BRAND")
+  excerpt        String
+  description    String
+  images         String[]
+  price          Float
+  discount       Int             @default(0)
+  wishlist       Wishlist[]
+  cart           Cart[]
+  comments       Comment[]
+  ratings        Rating[]
+  stock          Int
+  user           User            @relation(fields: [user_id], references: [id])
+  user_id        String
+  created_at     DateTime        @default(now())
+  category_group CategoryGroup[]
+  is_deleted     Boolean         @default(false)
 }
 
-enum RoleType {
-  ADMIN
+model CategoryGroup {
+  id          Int      @id @default(autoincrement())
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id Int
+  product     Product  @relation(fields: [product_id], references: [id])
+  product_id  String
+}
+
+model Rating {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    String
+  rating     Float
+  product    Product? @relation(fields: [product_id], references: [id])
+  product_id String?
+
+}
+
+model Comment {
+  id         Int     @id @default(autoincrement())
+  user       User    @relation(fields: [user_id], references: [id])
+  user_id    String
+  product    Product @relation(fields: [product_id], references: [id])
+  product_id String
+
+}
+
+enum Role {
   USER
+  ADMIN
 }

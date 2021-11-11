@@ -15,11 +15,6 @@ async function seedUsers() {
 				role: 'USER',
 			},
 		})
-		const cart = await prisma.cart.create({
-			data: {
-				userId: user.id,
-			},
-		})
 		console.log(`👽 Created user with id: ${user.id}`)
 	}
 }
@@ -28,7 +23,7 @@ async function seedCategories() {
 	for (const [c, i] of categoriesData.entries()) {
 		const category = await prisma.category.create({
 			data: {
-				name: `category${i}`,
+				category_name: `category_name${i}`,
 			},
 		})
 		console.log(`👽 Created category with id: ${category.id}`)
@@ -42,14 +37,14 @@ async function seedProducts() {
 	for (const [p, i] of productsData.entries()) {
 		const product = await prisma.product.create({
 			data: {
-				name: `product_name${i}`,
+				title: `product_name${i}`,
 				description: `product_description${i}`,
 				price: Math.floor(Math.random() * 100),
-				stocks: Math.floor(Math.random() * 100),
-				inStock: true,
-				category: {
+				stock: Math.floor(Math.random() * 100),
+				excerpt: `product_excerpt${i}`,
+				user: {
 					connect: {
-						id: categoryIds[Math.floor(Math.random() * categoryIds.length)],
+						email: 'root_user2@gmail.com',
 					},
 				},
 			},
@@ -62,7 +57,7 @@ async function main() {
 	console.log(`---🌿 STARTED SEEDING 🌿--- `)
 	// seedUsers()
 	// seedCategories()
-	seedProducts()
+	// seedProducts()
 	console.log(`---🌿 FINISHED SEEDING 🌿--- `)
 }
 

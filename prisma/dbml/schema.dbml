@@ -11,68 +11,117 @@ Table Session {
   userId String
 }
 
-Table Cart {
-  id String [pk]
-  userId String [unique, not null]
-  cartProducts CartProduct [not null]
-  type CartType [not null, default: 'CART']
-  User User [not null]
-}
-
-Table CartProduct {
-  id String [pk]
-  cartId String [not null]
-  productId String [not null]
-  quantity Int [not null]
-  cart Cart [not null]
-  product Product [not null]
-}
-
-Table Category {
-  id String [pk]
-  name String [unique, not null]
-  products Product [not null]
-}
-
-Table Product {
-  id String [pk]
-  name String [not null]
-  description String [not null]
-  price Float [not null]
-  categoryId String [not null]
-  category Category [not null]
-  cartProducts CartProduct [not null]
-  image String
-  inStock Boolean [not null, default: true]
-  stocks Int [not null]
-}
-
 Table User {
   id String [pk]
   name String [not null]
   email String [unique, not null]
   hashedPassword String [not null]
   sessions Session [not null]
-  role RoleType [not null, default: 'USER']
-  cart Cart
+  role Role [not null, default: 'USER']
+  created_at DateTime [default: `now()`, not null]
+  update_at DateTime [not null]
+  ratings Rating [not null]
+  comments Comment [not null]
+  wishlists Wishlist [not null]
+  products Product [not null]
+  cart Cart [not null]
 }
 
-Enum CartType {
-  CART
-  WISHLIST
+Table Wishlist {
+  id Int [pk, increment]
+  product Product [not null]
+  product_id String [not null]
+  wishlist_name String [not null, default: 'default']
+  user User [not null]
+  user_id String [not null]
 }
 
-Enum RoleType {
-  ADMIN
+Table Category {
+  id Int [pk, increment]
+  category_name String [unique, not null]
+  category_group CategoryGroup [not null]
+}
+
+Table Cart {
+  id Int [pk, increment]
+  product Product
+  product_id String
+  quantity Int [not null]
+  user User [not null]
+  user_id String [not null]
+}
+
+Table Product {
+  id String [pk]
+  title String [not null]
+  brand String [default: 'GENERIC_BRAND']
+  excerpt String [not null]
+  description String [not null]
+  images String [not null]
+  price Float [not null]
+  discount Int [not null, default: 0]
+  wishlist Wishlist [not null]
+  cart Cart [not null]
+  comments Comment [not null]
+  ratings Rating [not null]
+  stock Int [not null]
+  user User [not null]
+  user_id String [not null]
+  created_at DateTime [default: `now()`, not null]
+  category_group CategoryGroup [not null]
+  is_deleted Boolean [not null, default: false]
+}
+
+Table CategoryGroup {
+  id Int [pk, increment]
+  category Category [not null]
+  category_id Int [not null]
+  product Product [not null]
+  product_id String [not null]
+}
+
+Table Rating {
+  id Int [pk, increment]
+  user User [not null]
+  user_id String [not null]
+  rating Float [not null]
+  product Product
+  product_id String
+}
+
+Table Comment {
+  id Int [pk, increment]
+  user User [not null]
+  user_id String [not null]
+  product Product [not null]
+  product_id String [not null]
+}
+
+Enum Role {
   USER
+  ADMIN
 }
 
 Ref: Session.userId > User.id
 
-Ref: Cart.userId - User.id
+Ref: Wishlist.product_id > Product.id
 
-Ref: CartProduct.cartId > Cart.id
+Ref: Wishlist.user_id > User.id
 
-Ref: CartProduct.productId > Product.id
+Ref: Cart.product_id > Product.id
 
-Ref: Product.categoryId > Category.id
+Ref: Cart.user_id > User.id
+
+Ref: Product.user_id > User.id
+
+Ref: CategoryGroup.category_id > Category.id
+
+Ref: CategoryGroup.product_id > Product.id
+
+Ref: Rating.user_id > User.id
+
+Ref: Rating.product_id > Product.id
+
+Ref: Comment.user_id > User.id
+
+Ref: Comment.product_id > Product.id
