@@ -118,4 +118,46 @@ router.post(
 	}
 )
 
+router.post(
+	'/remove',
+	requireAuth,
+	async (req: ExpressRequest, res: CustomResponse) => {
+		const user = req.user
+		const { productId } = req.body
+
+		try {
+			const product = await prisma.product.findUnique({
+				where: { id: productId },
+			})
+			if (!product) throw new Error('Product not found')
+
+			const wishlist = await prisma.wishlist.delete({
+				where: {
+					user_id_product_id: {
+						product_id: productId,
+						user_id: user!.id,
+					},
+				},
+			})
+
+			res.status(200).json({
+				code: WishlistStatus.PRODUCT_REMOVED_FROM_WISHLIST,
+				success: true,
+				data: {
+					wishlist,
+				},
+			})
+		} catch (e: any) {
+			console.log(e.message)
+			res.status(500).json({
+				code: HttpStatus.INTERNAL_SERVER_ERROR,
+				success: false,
+				data: {
+					message: e.message,
+				},
+			})
+		}
+	}
+)
+
 export { router as WishlistController }
