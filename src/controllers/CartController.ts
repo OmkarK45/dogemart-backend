@@ -4,7 +4,12 @@ import { validateRequestBody } from 'zod-express-middleware'
 import { prisma } from '../config/db'
 import { CustomResponse, ExpressRequest } from '../config/express'
 import { requireAuth } from '../middlewares/AuthMiddleware'
-import { CartStatus, HttpStatus, ProductStatus } from '../utils/statusCodes'
+import {
+	CartStatus,
+	HttpStatus,
+	ProductStatus,
+	WishlistStatus,
+} from '../utils/statusCodes'
 
 const router = Router()
 
@@ -14,22 +19,36 @@ router.get(
 	requireAuth,
 	async (req: ExpressRequest, res: CustomResponse) => {
 		const user = req.user
+		const { skip, take } = req.query as { skip: string; take: string }
 
 		try {
-			const cart = await prisma.cart.findFirst({
+			const cart = await prisma.cart.findMany({
 				where: {
-					user_id: user?.id,
+					user: {
+						email: user?.email,
+					},
 				},
 				include: {
 					product: true,
 				},
+				skip: parseInt(skip) || 0,
+				take: parseInt(take) || 10,
 			})
 
-			// Your cart is empty!
-			res.json({
+			if (!cart || cart.length === 0) {
+				return res.json({
+					data: {
+						message: 'Your cart is empty.',
+					},
+					code: WishlistStatus.WISHLIST_EMPTY,
+					success: true,
+				})
+			}
+
+			res.status(200).json({
+				code: WishlistStatus.WISHLIST_FOUND,
 				success: true,
 				data: cart,
-				code: 'SUCCESS',
 			})
 		} catch (e: any) {
 			res.json({
@@ -67,16 +86,16 @@ router.post(
 					code: ProductStatus.PRODUCTS_NOT_FOUND,
 				})
 			}
-			let cart
-			cart = await prisma.cart.findFirst({
+
+			const cart = await prisma.cart.findMany({
 				where: {
 					user_id: user?.id,
 				},
 			})
 
-			if (!cart) {
+			if (!cart || cart.length === 0) {
 				// create cart
-				cart = await prisma.cart.create({
+				const cart = await prisma.cart.create({
 					data: {
 						user: { connect: { id: user?.id } },
 						product: { connect: { id: productId } },
@@ -107,12 +126,12 @@ router.post(
 						code: CartStatus.PRODUCT_ALREADY_IN_CART,
 					})
 				}
-				// update cart
-				const updatedCart = await prisma.cart.update({
-					where: { id: cart.id },
+				//create new cart item
+				const updatedCart = await prisma.cart.create({
 					data: {
-						quantity: cart.quantity + quantity,
 						product: { connect: { id: productId } },
+						user: { connect: { id: user?.id } },
+						quantity,
 					},
 				})
 
@@ -157,13 +176,13 @@ router.post(
 				})
 			}
 
-			const cart = await prisma.cart.findFirst({
+			const cart = await prisma.cart.findMany({
 				where: {
 					user_id: user?.id,
 				},
 			})
 
-			if (!cart) {
+			if (!cart || cart.length === 0) {
 				return res.json({
 					success: false,
 					data: { message: 'Your cart is empty.' },
@@ -171,10 +190,12 @@ router.post(
 				})
 			}
 
-			const productInCart = await prisma.cart.findFirst({
+			const productInCart = await prisma.cart.findUnique({
 				where: {
-					user_id: user?.id,
-					product_id: productId,
+					user_id_product_id: {
+						product_id: productId,
+						user_id: user!.id,
+					},
 				},
 			})
 
@@ -186,19 +207,15 @@ router.post(
 				})
 			}
 
-			const deletedProduct = await prisma.cart.update({
+			await prisma.cart.delete({
 				where: {
 					user_id_product_id: {
 						product_id: productId,
 						user_id: user!.id,
 					},
 				},
-				data: {
-					product: {
-						disconnect: true,
-					},
-				},
 			})
+
 			res.json({
 				success: true,
 				data: { message: 'Product has been removed from your cart.' },

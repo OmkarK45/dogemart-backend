@@ -6,7 +6,7 @@ import {
 	validateRequestParams,
 } from 'zod-express-middleware'
 import { z } from 'zod'
-import { HttpStatus } from '../utils/statusCodes'
+import { HttpStatus, ProductStatus } from '../utils/statusCodes'
 
 // Handler to get all products
 
@@ -73,9 +73,13 @@ router.get('/:id', validateRequestParams(OneProductInput), async (req, res) => {
 				},
 			},
 		})
-		if (!product) throw new Error('Requested product not found on the server.')
+		if (!product) {
+			return res.json({
+				code: ProductStatus.PRODUCT_NOT_FOUND,
+			})
+		}
 		res.json({
-			code: 'SUCCESS',
+			code: HttpStatus.SUCCESS,
 			success: true,
 			data: product,
 		})

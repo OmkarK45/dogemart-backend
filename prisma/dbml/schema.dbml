@@ -22,18 +22,22 @@ Table User {
   update_at DateTime [not null]
   ratings Rating [not null]
   comments Comment [not null]
-  wishlists Wishlist [not null]
+  wishlist Wishlist [not null]
   products Product [not null]
   cart Cart [not null]
 }
 
 Table Wishlist {
-  id Int [pk, increment]
-  product Product [not null]
-  product_id String [not null]
+  id String [pk]
+  product Product
+  product_id String
   wishlist_name String [not null, default: 'default']
   user User [not null]
   user_id String [not null]
+
+  indexes {
+    (user_id, product_id) [unique]
+  }
 }
 
 Table Category {

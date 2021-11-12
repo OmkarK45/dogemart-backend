@@ -38,18 +38,20 @@ model User {
   update_at      DateTime   @updatedAt
   ratings        Rating[]
   comments       Comment[]
-  wishlists      Wishlist[]
+  wishlist       Wishlist[]
   products       Product[]
   cart           Cart[]
 }
 
 model Wishlist {
-  id            Int     @id @default(autoincrement())
-  product       Product @relation(fields: [product_id], references: [id])
-  product_id    String
-  wishlist_name String  @default("default")
-  user          User    @relation(fields: [user_id], references: [id])
+  id            String   @id @default(uuid())
+  product       Product? @relation(fields: [product_id], references: [id])
+  product_id    String?
+  wishlist_name String   @default("default")
+  user          User     @relation(fields: [user_id], references: [id])
   user_id       String
+
+  @@unique([user_id, product_id])
 }
 
 model Category {

@@ -12,6 +12,7 @@ import {
 	AdminController,
 	ProductController,
 	CartController,
+	WishlistController,
 } from './controllers'
 
 const app = express()
@@ -48,7 +49,7 @@ app.use('/auth', AuthController)
 app.use('/admin/products', AdminController)
 app.use('/api/products', ProductController)
 app.use('/api/cart', CartController)
-
+app.use('/api/wishlist', WishlistController)
 app.use(cors(corsOptions))
 
 app.get('/', async (req, res) => {
