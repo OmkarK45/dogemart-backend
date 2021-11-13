@@ -4,6 +4,7 @@ import {
 	CartStatus,
 	HttpStatus,
 	ProductStatus,
+	ReviewStatus,
 	WishlistStatus,
 } from '../utils/statusCodes'
 
@@ -25,6 +26,7 @@ interface Json {
 		| keyof typeof CartStatus
 		| keyof typeof ProductStatus
 		| keyof typeof WishlistStatus
+		| keyof typeof ReviewStatus
 }
 
 type Send<T = Response> = (body?: Json) => T

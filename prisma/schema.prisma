@@ -36,8 +36,7 @@ model User {
   role           Role       @default(USER)
   created_at     DateTime   @default(now())
   update_at      DateTime   @updatedAt
-  ratings        Rating[]
-  comments       Comment[]
+  reviews        Review[]
   wishlist       Wishlist[]
   products       Product[]
   cart           Cart[]
@@ -72,19 +71,19 @@ model Cart {
 }
 
 model Product {
-  id             String          @id @default(uuid())
-  title          String
-  brand          String?         @default("GENERIC_BRAND")
-  excerpt        String
-  description    String
-  images         String[]
-  price          Float
-  discount       Int             @default(0)
-  slug           String?
-  wishlist       Wishlist[]
-  cart           Cart[]
-  comments       Comment[]
-  ratings        Rating[]
+  id          String     @id @default(uuid())
+  title       String
+  brand       String?    @default("GENERIC_BRAND")
+  excerpt     String
+  description String
+  images      String[]
+  price       Float
+  discount    Int        @default(0)
+  slug        String?
+  wishlist    Wishlist[]
+  cart        Cart[]
+  reviews     Review[]
+
   stock          Int
   user           User            @relation(fields: [user_id], references: [id])
   user_id        String
@@ -101,23 +100,18 @@ model CategoryGroup {
   product_id  String
 }
 
-model Rating {
-  id         Int      @id @default(autoincrement())
+model Review {
+  id         String   @id @default(uuid())
+  product    Product  @relation(fields: [product_id], references: [id])
+  product_id String
   user       User     @relation(fields: [user_id], references: [id])
   user_id    String
-  rating     Float
-  product    Product? @relation(fields: [product_id], references: [id])
-  product_id String?
+  rating     Int
+  comment    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
-}
-
-model Comment {
-  id         Int     @id @default(autoincrement())
-  user       User    @relation(fields: [user_id], references: [id])
-  user_id    String
-  product    Product @relation(fields: [product_id], references: [id])
-  product_id String
-
+  @@unique([product_id, user_id])
 }
 
 enum Role {

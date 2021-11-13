@@ -20,8 +20,7 @@ Table User {
   role Role [not null, default: 'USER']
   created_at DateTime [default: `now()`, not null]
   update_at DateTime [not null]
-  ratings Rating [not null]
-  comments Comment [not null]
+  reviews Review [not null]
   wishlist Wishlist [not null]
   products Product [not null]
   cart Cart [not null]
@@ -71,8 +70,7 @@ Table Product {
   slug String
   wishlist Wishlist [not null]
   cart Cart [not null]
-  comments Comment [not null]
-  ratings Rating [not null]
+  reviews Review [not null]
   stock Int [not null]
   user User [not null]
   user_id String [not null]
@@ -89,21 +87,20 @@ Table CategoryGroup {
   product_id String [not null]
 }
 
-Table Rating {
-  id Int [pk, increment]
-  user User [not null]
-  user_id String [not null]
-  rating Float [not null]
-  product Product
-  product_id String
-}
-
-Table Comment {
-  id Int [pk, increment]
-  user User [not null]
-  user_id String [not null]
+Table Review {
+  id String [pk]
   product Product [not null]
   product_id String [not null]
+  user User [not null]
+  user_id String [not null]
+  rating Int [not null]
+  comment String [not null]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+
+  indexes {
+    (product_id, user_id) [unique]
+  }
 }
 
 Enum Role {
@@ -127,10 +124,6 @@ Ref: CategoryGroup.category_id > Category.id
 
 Ref: CategoryGroup.product_id > Product.id
 
-Ref: Rating.user_id > User.id
+Ref: Review.product_id > Product.id
 
-Ref: Rating.product_id > Product.id
-
-Ref: Comment.user_id > User.id
-
-Ref: Comment.product_id > Product.id
+Ref: Review.user_id > User.id
