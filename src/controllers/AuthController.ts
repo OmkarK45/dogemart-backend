@@ -10,6 +10,7 @@ const router = Router()
 
 router.post('/login', async (req, res: CustomResponse) => {
 	const { email, password } = req.body
+	console.log(email, password)
 	try {
 		const user = await prisma.user.findFirst({
 			where: {
@@ -28,8 +29,8 @@ router.post('/login', async (req, res: CustomResponse) => {
 				},
 			})
 		}
-
 		const correctPassword = await verifyPassword(user.hashedPassword, password)
+		console.log(correctPassword)
 
 		if (!correctPassword) {
 			return res.status(401).json({
@@ -62,7 +63,7 @@ router.post('/login', async (req, res: CustomResponse) => {
 		})
 	} catch (e: any) {
 		console.log(
-			`[Error] : File - AuthController, Function : /signup [post]`,
+			`[Error] : File - AuthController, Function : /signin [post]`,
 			e.message
 		)
 		res.json({
@@ -141,6 +142,9 @@ router.get(
 				name: true,
 				hashedPassword: false,
 				role: true,
+				wishlist: {
+					take: 5,
+				},
 			},
 			rejectOnNotFound: true,
 		})

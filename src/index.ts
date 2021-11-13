@@ -27,8 +27,7 @@ declare module 'express-session' {
 }
 
 app.use(express.json())
-app.use(express.text({ type: 'text/html' }))
-app.use(express.raw({ type: 'application/vnd.custom-type' }))
+app.use(express.urlencoded({ extended: true }))
 
 app.use(
 	session({
@@ -46,13 +45,13 @@ app.use(
 		saveUninitialized: false,
 	})
 )
+app.use(cors(corsOptions))
 app.use('/auth', AuthController)
 app.use('/admin/products', AdminController)
 app.use('/api/products', ProductController)
 app.use('/api/cart', CartController)
 app.use('/api/wishlist', WishlistController)
 app.use('/api/reviews', ReviewController)
-app.use(cors(corsOptions))
 
 app.get('/', async (req, res) => {
 	res.send('API HEALTHY')
