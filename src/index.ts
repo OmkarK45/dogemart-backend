@@ -35,7 +35,7 @@ app.use(
 		secret: 'MySessionSecret',
 		cookie: {
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'none',
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
 		},
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000, //ms
