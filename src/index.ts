@@ -33,11 +33,7 @@ app.use(
 	session({
 		name: 'dogemart.cookie.v2',
 		secret: 'MySessionSecret',
-		cookie: {
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-			httpOnly: false,
-		},
+		cookie: { secure: false },
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000, //ms
 			dbRecordIdIsSessionId: true,
