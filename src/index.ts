@@ -55,7 +55,13 @@ app.use('/api/wishlist', WishlistController)
 app.use('/api/reviews', ReviewController)
 
 app.get('/', async (req, res) => {
-	res.send('API HEALTHY')
+	res.send(`
+		<h1>Welcome to Dogemart</h1>
+		<p>
+		NODE_ENV: ${process.env.NODE_ENV}
+		PORT: ${port}
+		</p>
+	`)
 })
 
 app.listen(port, () => {
