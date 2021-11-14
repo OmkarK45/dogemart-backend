@@ -27,6 +27,7 @@
 		"cors": "^2.8.5",
 		"express": "^4.17.1",
 		"express-session": "^1.17.2",
+		"iron-session": "^6.0.2",
 		"nanoid": "^3.1.30",
 		"prisma-dbml-generator": "^0.8.1",
 		"yup": "^0.32.11",

@@ -34,8 +34,9 @@ app.use(
 		name: 'dogemart.cookie.v2',
 		secret: 'MySessionSecret',
 		cookie: {
-			sameSite: 'none',
 			secure: process.env.NODE_ENV === 'production',
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			httpOnly: true,
 		},
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000, //ms
@@ -60,6 +61,8 @@ app.get('/', async (req, res) => {
 		<p>
 		NODE_ENV: ${process.env.NODE_ENV}
 		PORT: ${port}
+		secure: ${process.env.NODE_ENV === 'production'},
+		sameSite: ${process.env.NODE_ENV === 'production' ? 'none' : 'lax'},
 		</p>
 	`)
 })
