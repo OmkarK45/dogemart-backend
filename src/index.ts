@@ -36,7 +36,7 @@ app.use(
 		cookie: {
 			secure: process.env.NODE_ENV === 'production',
 			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-			httpOnly: true,
+			httpOnly: false,
 		},
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000, //ms
