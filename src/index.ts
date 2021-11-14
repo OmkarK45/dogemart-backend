@@ -34,7 +34,8 @@ app.use(
 		name: 'dogemart.cookie.v2',
 		secret: 'MySessionSecret',
 		cookie: {
-			secure: false,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'none',
 		},
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000, //ms
