@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import { prisma } from '../config/db'
 import { CustomResponse, ExpressRequest } from '../config/express'
+import { createToken } from '../config/jwt'
 import { requireAuth } from '../middlewares/AuthMiddleware'
 import { hashPassword, verifyPassword } from '../utils/password'
 import { HttpStatus } from '../utils/statusCodes'
@@ -53,12 +54,17 @@ router.post('/login', async (req, res: CustomResponse) => {
 
 		req.session.user = userInfo
 
+		const token = createToken({
+			...userInfo,
+		})
+
 		res.status(200).json({
 			code: 'SUCCESS',
 			success: true,
 			data: {
 				message: 'Login successful',
 				user: userInfo,
+				token,
 			},
 		})
 	} catch (e: any) {
@@ -132,7 +138,7 @@ router.get(
 	'/user-info',
 	requireAuth,
 	async (req: ExpressRequest, res: CustomResponse) => {
-		const { user } = req.session
+		const user = req.user
 		const currentUser = await prisma.user.findUnique({
 			where: { email: user?.email },
 			select: {

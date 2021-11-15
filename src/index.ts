@@ -2,7 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import session from 'express-session'
 import { PrismaSessionStore } from '@quixo3/prisma-session-store'
-
+// @ts-ignore
+import cookieParser from 'cookie-parser'
 import { prisma } from './config/db'
 import { corsOptions } from './config/cors'
 import { User } from '@prisma/client'
@@ -28,12 +29,16 @@ declare module 'express-session' {
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
+app.use(cookieParser())
 app.use(
 	session({
 		name: 'dogemart.cookie.v2',
 		secret: 'MySessionSecret',
-		cookie: { sameSite: 'lax' },
+		cookie: {
+			secure: process.env.NODE_ENV === 'production',
+			httpOnly: true,
+			maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+		},
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000, //ms
 			dbRecordIdIsSessionId: true,
