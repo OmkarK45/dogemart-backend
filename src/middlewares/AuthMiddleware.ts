@@ -6,6 +6,7 @@ export const requireAuth: RequestHandler = async (
 	res,
 	next
 ) => {
+	console.log(req.session)
 	const { user } = req.session
 	if (!user) {
 		return res.status(401).json({
