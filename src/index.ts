@@ -33,6 +33,7 @@ app.use(
 	session({
 		name: 'dogemart.cookie.v2',
 		secret: 'MySessionSecret',
+		cookie: { sameSite: 'lax' },
 		store: new PrismaSessionStore(prisma, {
 			checkPeriod: 2 * 60 * 1000, //ms
 			dbRecordIdIsSessionId: true,
