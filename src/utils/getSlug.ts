@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid'
 
-const generateSlugFromName = (
+export const generateSlugFromName = (
 	name: string,
 	suffix: string = '',
 	includeUUID: boolean = false
@@ -25,5 +25,3 @@ const generateSlugFromName = (
 		includeUUID ? '-' + nanoid(6) : ''
 	}`
 }
-
-export default generateSlugFromName

@@ -11,7 +11,7 @@ import {
 
 import { z } from 'zod'
 import { isAdmin } from '../utils/validateAdmin'
-import generateSlugFromName from '../utils/getSlug'
+import { generateSlugFromName } from '../utils/getSlug'
 import { HttpStatus } from '../utils/statusCodes'
 
 const router = Router()

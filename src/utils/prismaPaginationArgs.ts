@@ -1,3 +1,7 @@
+/**
+ * What the hell is this ?
+ * This is a small abstraction I wrote for offset pagination using page and per page query.
+ */
 interface PaginationInput {
 	page: number
 	limit: number
@@ -8,6 +12,11 @@ interface PaginationInput {
 	totalCount: number
 }
 
+/**
+ *
+ * @param req - Express Request Object
+ * @returns - Parsed values from PaginationInput
+ */
 export function getPaginationArgs(req: any) {
 	const query = req.query
 	const page = parseInt(query.page as string) || 1
@@ -30,6 +39,7 @@ export function getPaginationArgs(req: any) {
 }
 
 interface ResultShape {
+	/** Total items in a prisma collection */
 	totalCount: number
 	totalPage: number
 	currentPage: number
@@ -46,6 +56,12 @@ interface ResultShape {
 		limit: number
 	}
 }
+
+/**
+ *
+ * @param paginationInput - returned from PaginationInput + total count
+ * @returns - Page info
+ */
 export function generatePaginationResult({
 	page,
 	limit,

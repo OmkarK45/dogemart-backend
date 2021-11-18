@@ -18,9 +18,11 @@ export interface ExpressContext {
 	res: Response
 }
 
+// TODO: refine these types
 interface Json {
 	success: boolean
 	data?: any
+	pageInfo?: any
 	code:
 		| keyof typeof HttpStatus
 		| keyof typeof CartStatus

@@ -1,5 +1,14 @@
 import { prisma } from '../src/config/db'
 import { hashPassword } from '../src/utils/password'
+import {
+	getRandomColorsArray,
+	getRandomProductFeaturesArray,
+	getRandomProductImagesArray,
+	getRandomReviewAndRating,
+	productImages,
+} from './productMetadata'
+import { generateSlugFromName } from '../src/utils/getSlug'
+import _ from 'lodash'
 
 const userData = [...Array(5).keys()].slice(1)
 const productsData = [...Array(10).keys()].slice(1)
@@ -31,25 +40,18 @@ async function seedCategories() {
 }
 
 async function seedProducts() {
-	const allCategories = await prisma.category.findMany()
-	const categoryIds = allCategories.map((category) => category.id)
+	const users = await prisma.user.findMany()
+	const userIds = users.map((user) => user.id)
+	const products = await prisma.product.findMany({})
+	const productIds = products.map((product) => product.id)
 
-	for (const [p, i] of productsData.entries()) {
-		const product = await prisma.product.create({
+	for (const [p, i] of productIds.entries()) {
+		const product = await prisma.product.update({
+			where: { id: i },
 			data: {
-				title: `product_name${i + 10}`,
-				description: `product_description${i}`,
-				price: Math.floor(Math.random() * 100),
-				stock: Math.floor(Math.random() * 100),
-				excerpt: `product_excerpt${i}`,
-				user: {
-					connect: {
-						email: 'root_user2@gmail.com',
-					},
-				},
+				images: getRandomProductImagesArray(),
 			},
 		})
-		console.log(`👽 Created product with id: ${product.id}`)
 	}
 }
 

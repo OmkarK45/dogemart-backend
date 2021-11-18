@@ -11,7 +11,9 @@
 		"migrate:dev": "prisma migrate dev",
 		"migrate:deploy": "prisma migrate deploy",
 		"migrate:status": "prisma migrate status",
-		"generate": "prisma generate"
+		"generate": "prisma generate",
+		"studio": "npx prisma studio --browser none",
+		"typecheck": "tsc --noEmit"
 	},
 	"prisma": {
 		"seed": "ts-node prisma/seed.ts"
@@ -30,6 +32,7 @@
 		"express-session": "^1.17.2",
 		"iron-session": "^6.0.2",
 		"jsonwebtoken": "^8.5.1",
+		"lodash": "^4.17.21",
 		"nanoid": "^3.1.30",
 		"prisma-dbml-generator": "^0.8.1",
 		"yup": "^0.32.11",
