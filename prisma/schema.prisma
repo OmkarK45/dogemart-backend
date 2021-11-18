@@ -73,7 +73,7 @@ model Cart {
 model Product {
   id          String     @id @default(uuid())
   title       String
-  brand       String?    @default("GENERIC_BRAND")
+  brand       String     @default("GENERIC_BRAND")
   excerpt     String
   description String
   images      String[]
@@ -90,6 +90,11 @@ model Product {
   created_at     DateTime        @default(now())
   category_group CategoryGroup[]
   is_deleted     Boolean         @default(false)
+
+  // optional product metadata
+  sizes    String[]
+  colors   String[]
+  features String[]
 }
 
 model CategoryGroup {

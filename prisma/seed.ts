@@ -37,7 +37,7 @@ async function seedProducts() {
 	for (const [p, i] of productsData.entries()) {
 		const product = await prisma.product.create({
 			data: {
-				title: `product_name${i}`,
+				title: `product_name${i + 10}`,
 				description: `product_description${i}`,
 				price: Math.floor(Math.random() * 100),
 				stock: Math.floor(Math.random() * 100),
@@ -57,7 +57,7 @@ async function main() {
 	console.log(`---🌿 STARTED SEEDING 🌿--- `)
 	// seedUsers()
 	// seedCategories()
-	// seedProducts()
+	seedProducts()
 	console.log(`---🌿 FINISHED SEEDING 🌿--- `)
 }
 

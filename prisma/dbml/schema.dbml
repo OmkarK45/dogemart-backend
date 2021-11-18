@@ -61,7 +61,7 @@ Table Cart {
 Table Product {
   id String [pk]
   title String [not null]
-  brand String [default: 'GENERIC_BRAND']
+  brand String [not null, default: 'GENERIC_BRAND']
   excerpt String [not null]
   description String [not null]
   images String [not null]
@@ -77,6 +77,9 @@ Table Product {
   created_at DateTime [default: `now()`, not null]
   category_group CategoryGroup [not null]
   is_deleted Boolean [not null, default: false]
+  sizes String [not null]
+  colors String [not null]
+  features String [not null]
 }
 
 Table CategoryGroup {
