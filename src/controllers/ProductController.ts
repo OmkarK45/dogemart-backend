@@ -38,7 +38,7 @@ router.get('/all', async (req, res: CustomResponse) => {
 			where: {},
 			include: {
 				_count: { select: { reviews: true } },
-				reviews: true,
+				reviews: { select: { rating: true } },
 				category_group: {
 					include: {
 						category: true,
@@ -77,7 +77,16 @@ router.get('/:id', validateRequestParams(OneProductInput), async (req, res) => {
 				id: req.params.id,
 			},
 			include: {
-				reviews: true,
+				_count: { select: { reviews: true } },
+				reviews: {
+					include: {
+						user: {
+							select: {
+								name: true,
+							},
+						},
+					},
+				},
 				category_group: {
 					include: {
 						category: true,

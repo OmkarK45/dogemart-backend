@@ -54,11 +54,22 @@ router.post(
 		const { comment, rating } = req.body
 
 		try {
+			const productReviewCount = await prisma.review.count({
+				where: { product: { id: productId } },
+			})
+
 			const isAlreadyReviewed = await prisma.review.findUnique({
 				where: {
 					product_id_user_id: {
 						product_id: productId,
 						user_id: user!.id,
+					},
+				},
+				include: {
+					product: {
+						select: {
+							rating: true,
+						},
 					},
 				},
 			})
@@ -80,7 +91,25 @@ router.post(
 					comment,
 					rating,
 				},
+				include: {
+					product: { select: { rating: true } },
+				},
 			})
+
+			const previousRatings = review.product.rating
+
+			const newAverageRating =
+				(previousRatings + rating) / (productReviewCount + 1)
+
+			await prisma.product.update({
+				where: { id: productId },
+				data: {
+					rating: { set: newAverageRating },
+				},
+			})
+
+			console.log('NEW AVERAGE RATING', newAverageRating)
+
 			res.json({
 				code: ReviewStatus.REVIEW_ADDED,
 				data: review,

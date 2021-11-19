@@ -71,6 +71,7 @@ Table Product {
   wishlist Wishlist [not null]
   cart Cart [not null]
   reviews Review [not null]
+  rating Float [not null, default: 0]
   stock Int [not null]
   user User [not null]
   user_id String [not null]

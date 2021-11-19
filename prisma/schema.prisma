@@ -71,19 +71,19 @@ model Cart {
 }
 
 model Product {
-  id          String     @id @default(uuid())
-  title       String
-  brand       String     @default("GENERIC_BRAND")
-  excerpt     String
-  description String
-  images      String[]
-  price       Float
-  discount    Int        @default(0)
-  slug        String?
-  wishlist    Wishlist[]
-  cart        Cart[]
-  reviews     Review[]
-
+  id             String          @id @default(uuid())
+  title          String
+  brand          String          @default("GENERIC_BRAND")
+  excerpt        String
+  description    String
+  images         String[]
+  price          Float
+  discount       Int             @default(0)
+  slug           String?
+  wishlist       Wishlist[]
+  cart           Cart[]
+  reviews        Review[]
+  rating         Float           @default(0)
   stock          Int
   user           User            @relation(fields: [user_id], references: [id])
   user_id        String

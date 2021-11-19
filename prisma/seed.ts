@@ -49,7 +49,7 @@ async function seedProducts() {
 		const product = await prisma.product.update({
 			where: { id: i },
 			data: {
-				images: getRandomProductImagesArray(),
+				rating: Number((Math.random() * 4 + Math.random()).toFixed(1)),
 			},
 		})
 	}
