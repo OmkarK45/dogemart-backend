@@ -113,6 +113,10 @@ router.post('/signup', async (req, res: CustomResponse) => {
 			update_at: savedUser.update_at,
 		}
 
+		const token = createToken({
+			...userInfo,
+		})
+
 		req.session.user = userInfo
 
 		res.status(200).json({
@@ -120,6 +124,7 @@ router.post('/signup', async (req, res: CustomResponse) => {
 			success: true,
 			data: {
 				user: userInfo,
+				token,
 			},
 		})
 	} catch (e: any) {
