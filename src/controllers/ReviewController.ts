@@ -21,7 +21,13 @@ router.get(
 		try {
 			const reviews = await prisma.review.findMany({
 				where: { product: { id: productId } },
-				include: { user: true },
+				include: {
+					user: {
+						select: {
+							name: true,
+						},
+					},
+				},
 			})
 			res.json({
 				code: ReviewStatus.REVIEW_FOUND,
@@ -107,8 +113,6 @@ router.post(
 					rating: { set: newAverageRating },
 				},
 			})
-
-			console.log('NEW AVERAGE RATING', newAverageRating)
 
 			res.json({
 				code: ReviewStatus.REVIEW_ADDED,

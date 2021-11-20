@@ -5,6 +5,10 @@ import { prisma } from '../config/db'
 import { CustomResponse, ExpressRequest } from '../config/express'
 import { requireAuth } from '../middlewares/AuthMiddleware'
 import {
+	generatePaginationResult,
+	getPaginationArgs,
+} from '../utils/prismaPaginationArgs'
+import {
 	CartStatus,
 	HttpStatus,
 	ProductStatus,
@@ -19,36 +23,31 @@ router.get(
 	requireAuth,
 	async (req: ExpressRequest, res: CustomResponse) => {
 		const user = req.user
-		const { skip, take } = req.query as { skip: string; take: string }
+		const args = getPaginationArgs(req)
 
 		try {
-			const cart = await prisma.cart.findMany({
-				where: {
-					user: {
-						email: user?.email,
-					},
-				},
-				include: {
-					product: true,
-				},
-				skip: parseInt(skip) || 0,
-				take: parseInt(take) || 10,
+			const totalCount = await prisma.cart.count({
+				where: { user: { id: user?.id } },
 			})
 
-			if (!cart || cart.length === 0) {
-				return res.json({
-					data: {
-						message: 'Your cart is empty.',
-					},
-					code: WishlistStatus.WISHLIST_EMPTY,
-					success: true,
-				})
-			}
+			const cart = await prisma.cart.findMany({
+				where: { user_id: user?.id },
+				include: { product: true },
+				// This is not working as expected
+				skip: args.startIndex,
+				take: args.limit,
+			})
+			console.log(cart)
+			const pageInfo = generatePaginationResult({
+				...args,
+				totalCount,
+			})
 
 			res.status(200).json({
-				code: WishlistStatus.WISHLIST_FOUND,
+				pageInfo,
+				code: HttpStatus.SUCCESS,
 				success: true,
-				data: cart,
+				data: cart ? cart : [],
 			})
 		} catch (e: any) {
 			res.json({

@@ -18,9 +18,7 @@ const router = Router()
 // /api/products
 
 router.get('/all', async (req, res: CustomResponse) => {
-	const { skip, take, orderBy } = req.query as {
-		skip: string
-		take: string
+	const { orderBy } = req.query as {
 		orderBy: 'asc' | 'desc'
 		category: string
 	}
@@ -122,10 +120,12 @@ router.post(
 	validateRequestBody(SearchInput),
 	async (req, res: CustomResponse) => {
 		const { keyword } = req.body
+		const args = getPaginationArgs(req)
+
 		const { skip, take } = req.query as { skip: string; take: string }
 
 		try {
-			const products = await prisma.product.findMany({
+			const totalCount = await prisma.product.count({
 				where: {
 					OR: [
 						{ description: { contains: keyword, mode: 'insensitive' } },
@@ -133,15 +133,32 @@ router.post(
 						{ excerpt: { contains: keyword, mode: 'insensitive' } },
 					],
 				},
+			})
+
+			const pageInfo = generatePaginationResult({
+				...args,
+				totalCount,
+			})
+
+			const products = await prisma.product.findMany({
+				where: {
+					OR: [
+						{ description: { contains: keyword, mode: 'insensitive' } },
+						{ title: { contains: keyword, mode: 'insensitive' } },
+						{ excerpt: { contains: keyword, mode: 'insensitive' } },
+						{ brand: { contains: keyword, mode: 'insensitive' } },
+					],
+				},
 				include: {
 					reviews: true,
 					category_group: { include: { category: true } },
 				},
-				skip: skip ? parseInt(skip) : 0,
-				take: take ? parseInt(take) : 10,
+				take: args.limit,
+				skip: args.startIndex,
 			})
 
 			res.json({
+				pageInfo,
 				code: 'SUCCESS',
 				success: true,
 				data: products,

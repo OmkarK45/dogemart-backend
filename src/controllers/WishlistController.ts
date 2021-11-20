@@ -6,6 +6,10 @@ import { requireAuth } from '../middlewares/AuthMiddleware'
 import { HttpStatus, WishlistStatus } from '../utils/statusCodes'
 import { validateRequestBody } from 'zod-express-middleware'
 import { z } from 'zod'
+import {
+	generatePaginationResult,
+	getPaginationArgs,
+} from '../utils/prismaPaginationArgs'
 
 const router = Router()
 
@@ -15,9 +19,15 @@ router.get(
 	requireAuth,
 	async (req: ExpressRequest, res: CustomResponse) => {
 		const user = req.user
-		const { skip, take } = req.query as { skip: string; take: string }
+		const args = getPaginationArgs(req)
 
 		try {
+			const totalCount = await prisma.wishlist.count({
+				where: {
+					user_id: user?.id,
+				},
+			})
+
 			const wishlist = await prisma.wishlist.findMany({
 				where: {
 					user_id: user?.id,
@@ -25,26 +35,20 @@ router.get(
 				include: {
 					product: true,
 				},
-				skip: parseInt(skip) || 0,
-				take: parseInt(take) || 10,
+				skip: args.startIndex,
+				take: args.limit,
 			})
 
-			if (!wishlist || wishlist.length === 0) {
-				return res.json({
-					data: {
-						message: 'Your wishlist is empty.',
-					},
-					code: WishlistStatus.WISHLIST_EMPTY,
-					success: true,
-				})
-			}
+			const pageInfo = generatePaginationResult({
+				...args,
+				totalCount,
+			})
 
 			res.status(200).json({
+				pageInfo,
 				code: WishlistStatus.WISHLIST_FOUND,
 				success: true,
-				data: {
-					wishlist,
-				},
+				data: wishlist ? wishlist : [],
 			})
 		} catch (e: any) {
 			res.status(500).json({

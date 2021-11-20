@@ -20,6 +20,14 @@ router.post('/login', async (req, res: CustomResponse) => {
 					mode: 'insensitive',
 				},
 			},
+			include: {
+				_count: {
+					select: {
+						cart: true,
+						wishlist: true,
+					},
+				},
+			},
 		})
 		if (!user) {
 			return res.status(404).json({
@@ -50,6 +58,8 @@ router.post('/login', async (req, res: CustomResponse) => {
 			role: user.role,
 			created_at: user.created_at,
 			update_at: user.update_at,
+			cart_item_count: user?._count ? user._count.cart : 0,
+			wishlist_item_count: user?._count ? user._count.wishlist : 0,
 		}
 
 		req.session.user = userInfo
