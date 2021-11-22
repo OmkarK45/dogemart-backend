@@ -49,6 +49,8 @@ model Wishlist {
   wishlist_name String   @default("default")
   user          User     @relation(fields: [user_id], references: [id])
   user_id       String
+  size          String?
+  color         String?
 
   @@unique([user_id, product_id])
 }
@@ -64,6 +66,8 @@ model Cart {
   product    Product? @relation(fields: [product_id], references: [id])
   product_id String?
   quantity   Int?
+  color      String?
+  size       String?
   user       User     @relation(fields: [user_id], references: [id])
   user_id    String
 

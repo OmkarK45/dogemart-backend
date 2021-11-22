@@ -72,7 +72,7 @@ router.post(
 	validateRequestBody(AddToWishlistInput),
 	async (req: ExpressRequest, res: CustomResponse) => {
 		const user = req.user
-		const { productId } = req.body
+		const { productId, size, color } = req.body
 
 		try {
 			const isAlreadyInWishlist = await prisma.wishlist.findUnique({
@@ -98,6 +98,8 @@ router.post(
 						product: { connect: { id: productId } },
 						user: { connect: { id: user!.id } },
 						wishlist_name: `${user?.id}-wishlist`,
+						size,
+						color,
 					},
 				})
 

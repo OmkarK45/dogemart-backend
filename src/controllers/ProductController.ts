@@ -150,8 +150,9 @@ router.post(
 					],
 				},
 				include: {
-					reviews: true,
 					category_group: { include: { category: true } },
+					reviews: { select: { rating: true } },
+					_count: { select: { reviews: true } },
 				},
 				take: args.limit,
 				skip: args.startIndex,

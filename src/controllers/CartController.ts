@@ -71,7 +71,7 @@ router.post(
 	async (req: ExpressRequest, res: CustomResponse) => {
 		// add product to cart
 		const user = req.user
-		const { productId, quantity } = req.body
+		const { productId, quantity, size, color } = req.body
 
 		try {
 			const product = await prisma.product.findFirst({
@@ -99,6 +99,8 @@ router.post(
 						user: { connect: { id: user?.id } },
 						product: { connect: { id: productId } },
 						quantity: quantity,
+						size,
+						color,
 					},
 				})
 
@@ -131,6 +133,8 @@ router.post(
 						product: { connect: { id: productId } },
 						user: { connect: { id: user?.id } },
 						quantity,
+						size,
+						color,
 					},
 				})
 

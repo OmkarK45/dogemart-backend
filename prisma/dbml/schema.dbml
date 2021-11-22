@@ -33,6 +33,8 @@ Table Wishlist {
   wishlist_name String [not null, default: 'default']
   user User [not null]
   user_id String [not null]
+  size String
+  color String
 
   indexes {
     (user_id, product_id) [unique]
@@ -50,6 +52,8 @@ Table Cart {
   product Product
   product_id String
   quantity Int
+  color String
+  size String
   user User [not null]
   user_id String [not null]
 
