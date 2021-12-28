@@ -46,7 +46,7 @@ router.get('/all', async (req, res: CustomResponse) => {
 			take: args.limit,
 			skip: args.startIndex,
 			orderBy: {
-				created_at: orderBy ? orderBy : 'desc',
+				created_at: orderBy ? orderBy : 'asc',
 			},
 		})
 
@@ -188,7 +188,16 @@ router.get('/all/category', async (req, res: CustomResponse) => {
 			skip: skip ? parseInt(skip) : 0,
 			include: {
 				category_group: {
-					include: { product: true },
+					include: {
+						product: {
+							include: {
+								reviews: true,
+								_count: {
+									select: { reviews: true },
+								},
+							},
+						},
+					},
 				},
 			},
 		})
