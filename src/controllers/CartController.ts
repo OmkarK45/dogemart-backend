@@ -234,4 +234,42 @@ router.post(
 	}
 )
 
+router.post('/clear-cart', requireAuth, async (req: ExpressRequest, res) => {
+	const user = req.user
+
+	try {
+		const cart = await prisma.cart.findMany({
+			where: {
+				user_id: user?.id,
+			},
+		})
+
+		if (!cart || cart.length === 0) {
+			return res.json({
+				success: false,
+				data: { message: 'Your cart is empty.' },
+				code: CartStatus.CART_NOT_FOUND,
+			})
+		}
+
+		await prisma.cart.deleteMany({
+			where: {
+				user_id: user?.id,
+			},
+		})
+
+		res.json({
+			success: true,
+			data: { message: 'Your cart has been cleared.' },
+			code: CartStatus.PRODUCT_REMOVED_FROM_CART,
+		})
+	} catch (e: any) {
+		res.json({
+			success: false,
+			data: e.message,
+			code: HttpStatus.INTERNAL_SERVER_ERROR,
+		})
+	}
+})
+
 export { router as CartController }

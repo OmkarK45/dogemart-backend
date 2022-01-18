@@ -9,17 +9,31 @@ export const requireAuth: RequestHandler = async (
 	next
 ) => {
 	console.log(req.cookies['token'])
-	const token = req.cookies['token']
-	if (!token) {
+	try {
+		const token = req.cookies['token']
+		if (!token) {
+			return res.status(401).json({
+				msg: 'You are unauthorized to access this resource.',
+				error_code: 'ERROR_UNAUTHORIZED',
+			})
+		}
+		const user = decryptToken<User>(token)
+
+		if (!user) {
+			return res.status(401).json({
+				msg: 'You are unauthorized to access this resource.',
+				error_code: 'ERROR_UNAUTHORIZED',
+			})
+		}
+		console.log(user)
+
+		req.user = user
+
+		next()
+	} catch (e) {
 		return res.status(401).json({
 			msg: 'You are unauthorized to access this resource.',
 			error_code: 'ERROR_UNAUTHORIZED',
 		})
 	}
-	const user = decryptToken<User>(token)
-	console.log(user)
-
-	req.user = user
-
-	next()
 }

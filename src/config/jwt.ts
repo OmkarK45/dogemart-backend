@@ -23,8 +23,6 @@ export function decryptToken<T>(token: string): T {
 	try {
 		const isVerified = jwt.verify(token, 'mysecret')
 
-		if (!isVerified) throw new Error('Token has been malformed.')
-
 		const payload = jwt.decode(token)
 		return payload as T
 	} catch (error) {
